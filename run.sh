@@ -39,8 +39,30 @@ CMD="$DIR/$PPPWN_EXEC --interface eth0 --fw $FW_VERSION --stage1 $STAGE1_FILE --
 [ "$NO_WAIT_PADI" == "true" ] && CMD="$CMD --no-wait-padi"
 [ "$REAL_SLEEP" == "true" ] && CMD="$CMD --real-sleep"
 
+ifdown() {
+    printf "Shutting down interface eth0... "
+    ip link set eth0 down
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+ifup() {
+    ip link show eth0 | grep -q "UP"
+    [ $? = 0 ] && return
+    printf "Bringing up interface eth0... "
+    ip link set eth0 up
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+kill_services() {
+	#Stop pppoe server, nginx, php-fpm and any running pppwn
+	printf "Stopping services... "
+	SERVICE_PIDS=`pidof pppoe pppoe-server php-fpm nginx pppwn1 pppwn2 pppwn3`
+	[ "$SERVICE_PIDS" != "" ] && (kill -9 $SERVICE_PIDS && echo "OK" || echo "FAIL") || echo "NOT RUNNING"
+}
+
 execute_pppwn() {
     stop
+    ifup
     if [ "$RESTMODE" = "true" -o "$PPPOE_WAIT" = "true" ]; then
 		# Wait for PPPoE if needed
 		wait_for_pppoe
@@ -52,28 +74,22 @@ execute_pppwn() {
 			else
 				printf "GoldHen is not running, Starting PPPwn...\n"
         stop
-				$CMD >$LOG_FILE 2>&1
-				if grep -q "\[+\] Done!" $LOG_FILE; then
-        echo "PPPwned"
-       fi 
+        ifup
+				$CMD
 			fi
 		else
 			# If RESTMODE is not true, proceed with PPPwn
 			printf "Executing PPPwn...\n"
       stop
-			$CMD >$LOG_FILE 2>&1
-			if grep -q "\[+\] Done!" $LOG_FILE; then
-      echo "PPPwned" 
-     fi 
+      ifup
+			$CMD
 		fi
 	else
 		# If neither RESTMODE nor PPPOE_WAIT is true, execute PPPwn directly
 		printf "Executing PPPwn...\n"
     stop
-		$CMD >$LOG_FILE 2>&1
-		if grep -q "\[+\] Done!" $LOG_FILE; then
-    echo "PPPwned" 
-   fi 
+    ifup
+		$CMD
   fi
 	restart_services
 }
@@ -113,30 +129,21 @@ check_status() {
 }
 
 start_services() {
+  ifup
 	# Start PPPoE server, nginx, php-fpm
-  stop
   pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &
   /etc/init.d/S50nginx start
   /etc/init.d/S49php-fpm start
 }
 
 restart_services() {
+  stop
 	start_services
 }
 
-reseteth() {
-  /etc/init.d/S50nginx stop
-  /etc/init.d/S49php-fpm stop
-  >$LOG_FILE
-  sleep 1  
-  ifconfig eth0 down
-  sleep 1
-  ifconfig eth0 up
-  sleep 3
-}
-
 stop() {
-	reseteth
+	kill_services
+	ifdown
 }
 
 if [ "$AUTO_START" = "true" ]; then
