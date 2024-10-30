@@ -22,8 +22,6 @@ HALT_CHOICE=$(read_json 'HALT_CHOICE')
 PPPWN_EXEC=$(read_json 'PPPWN_EXEC')
 DIR=$(read_json 'install_dir')
 LOG_FILE=$(read_json 'log_file')
-RESTMODE=$(read_json 'RESTMODE');
-PPPOE_WAIT=$(read_json 'PPPOE_WAIT');
 
 STAGE1_FILE="$DIR/stage1/${FW_VERSION}/stage1.bin"
 STAGE2_FILE="$DIR/stage2/${FW_VERSION}/stage2.bin"
@@ -54,6 +52,10 @@ sleep 1
 reseteth
 $CMD >$LOG_FILE 2>&1
 if grep -q "\[+\] Done!" $LOG_FILE; then
+if [ "$HALT_CHOICE" = "true" ]; then
+sleep 1
+halt
+else
 sleep 5
 reseteth
 pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &

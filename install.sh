@@ -15,13 +15,14 @@ ______________________________
 EOF
 
 echo ""
-echo "★ v1.2.4 Unoficial ★"
+echo "★ v1.2.4 ★"
 echo ""
 echo "by: https://github.com/0x1iii1ii/PPPwn-Luckfox"
 echo "credit to:"
 echo "https://github.com/TheOfficialFloW/PPPwn for pppwn"
 echo "https://github.com/xfangfang/PPPwn_cpp for pppwn cpp"
 echo "https://github.com/harsha-0110/PPPwn-Luckfox for webserver"
+echo "https://github.com/GoldHEN/GoldHEN for GoldHEN"
 echo ""
 
 # Constants
@@ -32,6 +33,7 @@ BYellow='\033[1;33m' # Bold Yellow
 BCyan='\033[1;36m'   # Cyan
 NC='\033[0m'         # No Color
 
+LF_MODEL=$(cat /proc/device-tree/model)
 CURRENT_DIR=$(pwd)
 LOG_DIR="/var/log/pppwn.log"
 WEB_DIR="/var/www/data"
@@ -115,6 +117,44 @@ while true; do
     fi
 done
 
+if [ "$LF_MODEL" == "Luckfox Pico Ultra W" ]; then
+    # Ask if the user wants to use internet
+    while true; do
+        echo ""
+        echo -e "Do you want to enable ${BGreen}internet sharing${NC} for your PS4? (y/n)"
+        read -p "Enter your choice: " EN_INTERNET
+        if [[ "$EN_INTERNET" == "y" || "$EN_INTERNET" == "n" ]]; then
+            HU_INTERNET=$([ "$EN_INTERNET" = "y" ] && echo "yes" || echo "no")
+            if [[ "$EN_INTERNET" == "y" ]]; then
+                INET_CHOICE="true"
+                echo "Please enter your Wi-Fi credentials."
+                read -p "Enter Wi-Fi SSID: " WIFI_SSID
+                read -p "Enter Wi-Fi password: " WIFI_PASSWORD
+                echo ""
+                cat >/etc/wpa_supplicant.conf <<EOL
+ctrl_interface=/var/run/wpa_supplicant
+ap_scan=1
+update_config=1
+network={
+        ssid="$WIFI_SSID"
+        psk="$WIFI_PASSWORD"
+        key_mgmt=WPA-PSK
+}
+EOL
+                echo "Internet setup complete."
+                break
+            else
+                echo "Skipping internet sharing setup."
+                break
+            fi
+        else
+            echo "Invalid choice. Please enter 'y' or 'n'."
+        fi
+    done
+else
+    INET_CHOICE="false"
+fi
+
 echo ""
 echo "Please select the pppwn executable you want to use:"
 echo -e "a) ${BGreen}pppwn${NC} - a normal stable release for some PS4 models"
@@ -151,12 +191,20 @@ confirm_settings "$READABLE_FW_VERSION" "$READABLE_PPPWN_EXEC" "$READABLE_HALT_C
 # Create configuration directory if it doesn't exist
 if [ ! -d "$CONFIG_DIR" ]; then
     mkdir -p $CONFIG_DIR
+else
+    rm -rf $CONFIG_DIR
+    mkdir -p $CONFIG_DIR
+fi
+# Remove the web directory if it already exists
+if [ -d "$WEB_DIR" ]; then
+    rm -rf $WEB_DIR    
 fi
 
 # Create the config.json file with the install directory if it doesn't exist
 if [ ! -f "$CONFIG_FILE" ]; then
     cat >$CONFIG_FILE <<EOL
 {
+    "luckfox_model":"$LF_MODEL",
     "FW_VERSION": "$FW_VERSION",
     "TIMEOUT": "5",
     "WAIT_AFTER_PIN": "5",
@@ -173,16 +221,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "shutdown_flag": false,
     "execute_flag": false,
     "eth0_flag": false,
-    "RESTMODE" : true,
-    "PPPOE_WAIT" : true
+    "en_inet": $INET_CHOICE    
 }
 EOL
     chmod 777 $CONFIG_FILE
-fi
-
-# Remove the web directory if it already exists
-if [ -d "$WEB_DIR" ]; then
-    rm -rf $WEB_DIR
 fi
 
 if [ "$HALT_CHOICE" != "true" ]; then
