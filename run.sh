@@ -95,7 +95,7 @@ execute_pppwn() {
 }
 
 wait_for_pppoe() {
-    IP="192.168.1.2"
+    IP="42.42.42.42"
     MAX_ATTEMPTS=20  # Maximum number of iterations
 
     printf "Waiting for $IP to be reachable"
@@ -119,7 +119,7 @@ wait_for_pppoe() {
 }
 
 check_status() {
-    STATUS=$(nmap -p 3232 192.168.1.2 | grep '3232/tcp' | awk '{print $2}')
+    STATUS=$(nmap -p 3232 42.42.42.42 | grep '3232/tcp' | awk '{print $2}')
     
     if [ "$STATUS" = "open" ]; then
         return 0  # Port is open (true)

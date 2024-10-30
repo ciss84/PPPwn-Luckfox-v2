@@ -218,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="checkbox" id="RESTMODE" name="RESTMODE" <?php if ($config['RESTMODE']) echo 'checked'; ?>>
             <label for="RESTMODE">Reboot RestMode Detect GoldHen</label>
         </div>
+        
         <div class="checkbox-group">
             <input type="checkbox" id="PPPOE_WAIT" name="PPPOE_WAIT" <?php if ($config['PPPOE_WAIT']) echo 'checked'; ?>>
             <label for="PPPOE_WAIT">Wait for Successful PPPoE conection</label>
