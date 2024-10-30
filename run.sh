@@ -69,6 +69,7 @@ execute_pppwn() {
 		if [ "$RESTMODE" = "true" ]; then
 			# Check if GoldHen is running
 			check_status
+			check_status_net
 			if [ $? -eq 0 ]; then
 				printf "GoldHen is running, Skipping PPPwn...\n"
 			else
@@ -116,6 +117,16 @@ wait_for_pppoe() {
             break
         fi
     done
+}
+
+check_status_net() {
+    STATUS=$(nmap -p 3232 192.168.1.2 | grep '3232/tcp' | awk '{print $2}')
+    
+    if [ "$STATUS" = "open" ]; then
+        return 0  # Port is open (true)
+    else
+        return 1  # Port is closed or unreachable (false)
+    fi
 }
 
 check_status() {
