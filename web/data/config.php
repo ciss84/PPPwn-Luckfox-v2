@@ -34,8 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $config['NO_WAIT_PADI'] = isset($_POST['NO_WAIT_PADI']);
         $config['REAL_SLEEP'] = isset($_POST['REAL_SLEEP']);
         $config['AUTO_START'] = isset($_POST['AUTO_START']);
-        $config['RESTMODE'] = isset($_POST['RESTMODE']);
-        $config['PPPOE_WAIT'] = isset($_POST['PPPOE_WAIT']);        
         $config['HALT_CHOICE'] = isset($_POST['HALT_CHOICE']);
         save_config($config_file, $config);
         $message = "Configuration updated successfully.";
@@ -167,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="POST">
-        <label for="FW_VERSION">PS4 Firmware and Goldhen:</label>
+        <label for="FW_VERSION">PS4 Firmware and GoldHEN:</label>
         <select id="FW_VERSION" name="FW_VERSION" required>
             <option value="900" <?php if ($config['FW_VERSION'] == '900') echo 'selected'; ?>>9.00 - GoldHEN</option>
             <option value="903" <?php if ($config['FW_VERSION'] == '903') echo 'selected'; ?>>9.03 - GoldHEN</option>
@@ -177,7 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="1050" <?php if ($config['FW_VERSION'] == '1050') echo 'selected'; ?>>10.50 - GoldHEN</option>
             <option value="1070" <?php if ($config['FW_VERSION'] == '1070') echo 'selected'; ?>>10.70 - GoldHEN</option>
             <option value="1071" <?php if ($config['FW_VERSION'] == '1071') echo 'selected'; ?>>10.71 - GoldHEN</option>
-            <option value="1100" <?php if ($config['FW_VERSION'] == '1100') echo 'selected'; ?>>11.00 - GoldHEN</option>        </select>
+            <option value="1100" <?php if ($config['FW_VERSION'] == '1100') echo 'selected'; ?>>11.00 - GoldHEN</option>
+        </select>
 
         <label for="PPPWN_EXEC">PPPwn Executable:</label>
         <select id="PPPWN_EXEC" name="PPPWN_EXEC">
@@ -215,16 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="checkbox-group">
             <input type="checkbox" id="AUTO_START" name="AUTO_START" <?php if ($config['AUTO_START']) echo 'checked'; ?>>
             <label for="AUTO_START">Auto-Run PPPwn on Start-Up</label>
-        </div>
-
-        <div class="checkbox-group">
-            <input type="checkbox" id="RESTMODE" name="RESTMODE" <?php if ($config['RESTMODE']) echo 'checked'; ?>>
-            <label for="RESTMODE">Reboot RestMode Detect GoldHen</label>
-        </div>
-        
-        <div class="checkbox-group">
-            <input type="checkbox" id="PPPOE_WAIT" name="PPPOE_WAIT" <?php if ($config['PPPOE_WAIT']) echo 'checked'; ?>>
-            <label for="PPPOE_WAIT">Wait for Successful PPPoE conection</label>
         </div>
 
         <div class="checkbox-group">
