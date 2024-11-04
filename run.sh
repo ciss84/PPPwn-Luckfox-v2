@@ -46,38 +46,38 @@ reseteth() {
 
 echo "checking goldhen"
 pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &
-sleep 2
+sleep 1
 while ! ping -c 1 192.168.1.2 >/dev/null 2>&1; do
-sleep 2
+sleep 1
 done
 sleep 5
 if nmap -n -p 3232 192.168.1.2 | grep -q '3232/tcp open'; then
     echo "Goldhen found aborting pppwn"
-    GOLDHEN_ACTIVE=y
+    GOLDHEN_ACTIVE=true
 fi
 
 if [ "$AUTO_START" = "true" ]; then
-  if [ "$GOLDHEN_ACTIVE" = "n" ]; then
-  /etc/init.d/S50nginx stop
-  /etc/init.d/S49php-fpm stop
-  >$LOG_FILE
-  sleep 1
-  reseteth
-  $CMD >$LOG_FILE 2>&1
-  if grep -q "\[+\] Done!" $LOG_FILE; then
-  echo "PPPwned"
-    if [ "$HALT_CHOICE" = "true" ]; then
-      sleep 5
-      halt
-    else
-      reseteth
-      pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &
-      sleep 5
-      /etc/init.d/S50nginx start
-      /etc/init.d/S49php-fpm start
-    fi      
+  if [ "$GOLDHEN_ACTIVE" = "false" ]; then
+    /etc/init.d/S50nginx stop
+    /etc/init.d/S49php-fpm stop
+    >$LOG_FILE
+    sleep 1
+    reseteth
+    $CMD >>$LOG_FILE 2>&1
+    if grep -q "\[+\] Done!" $LOG_FILE; then
+      echo "PPPwned"
+      if [ "$HALT_CHOICE" = "true" ]; then
+        sleep 1
+        halt
+      else
+        reseteth
+        pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &
+        sleep 5
+        /etc/init.d/S50nginx start
+        /etc/init.d/S49php-fpm start
+      fi
+    fi
   fi
-fi  
 else
   echo "Auto Start is disabled, skipping PPPwn..."
 fi
