@@ -172,7 +172,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "log_file": "$LOG_DIR",    
     "shutdown_flag": false,
     "execute_flag": false,
-    "eth0_flag": false,   
+    "eth0_flag": false   
 }
 EOL
     chmod 777 $CONFIG_FILE
