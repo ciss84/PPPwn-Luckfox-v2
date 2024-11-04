@@ -15,7 +15,7 @@ ______________________________
 EOF
 
 echo ""
-echo "★ v1.2.5 ★"
+echo "★ v1.2.5 Unoficial ★"
 echo ""
 echo "by: https://github.com/0x1iii1ii/PPPwn-Luckfox"
 echo "credit to:"
