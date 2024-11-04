@@ -15,7 +15,7 @@ ______________________________
 EOF
 
 echo ""
-echo "★ v1.2.5 Unoficial ★"
+echo "★ v1.2.4 Unoficial ★"
 echo ""
 echo "by: https://github.com/0x1iii1ii/PPPwn-Luckfox"
 echo "credit to:"
@@ -165,7 +165,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "AUTO_RETRY": true,
     "NO_WAIT_PADI": true,
     "REAL_SLEEP": false,
-    "AUTO_START": false,
+    "AUTO_START": true,
 	  "HALT_CHOICE": $HALT_CHOICE,
 	  "PPPWN_EXEC": "$PPPWN_EXEC",
     "install_dir": "$CURRENT_DIR",
