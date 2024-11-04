@@ -49,7 +49,7 @@ if [ "$AUTO_START" = "true" ]; then
     /etc/init.d/S49php-fpm stop
     >$LOG_FILE
     sleep 1
-    reseteth
+    reseteth   
     $CMD >>$LOG_FILE 2>&1
     if grep -q "\[+\] Done!" $LOG_FILE; then
       echo "PPPwned"
@@ -63,7 +63,7 @@ if [ "$AUTO_START" = "true" ]; then
         /etc/init.d/S50nginx start
         /etc/init.d/S49php-fpm start
      fi
-  fi
+  fi 
 else
   echo "Auto Start is disabled, skipping PPPwn..."
   pppoe-server -I eth0 -T 60 -N 1 -C isp -S isp -L 192.168.1.1 -R 192.168.1.2 &
